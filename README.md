@@ -18,7 +18,7 @@ This skill enables Claude Code to interact with 2Ryun's REST API, providing:
 claude install 2ryun-api
 
 # Or manually
-git clone https://github.com/iguoguo/2ryun-api-skill ~/.claude/skills/2ryun-api
+git clone https://github.com/iguoguo/2Ryun-skill ~/.claude/skills/2ryun-api
 ```
 
 ## Setup

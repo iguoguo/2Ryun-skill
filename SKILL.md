@@ -1,5 +1,5 @@
 ---
-name: 2ryun-api
+name: 2Ryun-skill
 description: Use when the user wants to import documents, build a knowledge base, search structured knowledge, generate websites from content, or publish sites. Use when the user mentions 2Ryun, 第二现实, knowledge base, 知识库, 文档管理, 知识图谱, 建站, 发布网站. 2Ryun is an AI-era knowledge/content platform where knowledge extraction from documents happens automatically once enabled — the agent's role is to decide which documents should enter the knowledge base and which should not.
 ---
 
