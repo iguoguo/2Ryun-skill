@@ -7,7 +7,7 @@ description: Use when the user wants to import documents, build a knowledge base
 
 2Ryun（第二现实）为 AI Agent 提供文档管理、知识库、建站、笔记等能力。所有操作通过 REST API 调用（`Authorization: Bearer <key>` 鉴权，Key 从 2Ryun 设置页获取，格式为 `sk-` 前缀 + 多段随机字符）。
 
-**API 技术文档**: `docs/2ryun-api-spec.md` — 完整 endpoint、参数、返回格式。
+**API 技术文档**: `2ryun-api-spec.md` — 完整 endpoint、参数、返回格式。
 
 ## 核心机制：自动知识提取
 
