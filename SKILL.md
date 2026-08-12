@@ -42,7 +42,7 @@ description: Use when the user wants to import documents, build a knowledge base
 
 **从文本内容创建**：
 ```bash
-curl -X POST https://www.2ryun.com/restapi/documents/create \
+curl -X POST https://www.2ryun.com/api/documents/create \
   -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
   -d '{
     "title": "文档标题",
@@ -57,7 +57,7 @@ curl -X POST https://www.2ryun.com/restapi/documents/create \
 
 **从文件导入**：
 ```bash
-curl -X POST https://www.2ryun.com/restapi/documents/import \
+curl -X POST https://www.2ryun.com/api/documents/import \
   -H "Authorization: Bearer $API_KEY" \
   -F "file=@/path/to/file.pdf" -F "title=文档标题"
 ```
@@ -67,13 +67,13 @@ curl -X POST https://www.2ryun.com/restapi/documents/import \
 
 ```bash
 # 列表
-curl "https://www.2ryun.com/restapi/documents?page=1&pageSize=20" \
+curl "https://www.2ryun.com/api/documents?page=1&pageSize=20" \
   -H "Authorization: Bearer $API_KEY"
 # 搜索
-curl "https://www.2ryun.com/restapi/documents/search?q=关键词" \
+curl "https://www.2ryun.com/api/documents/search?q=关键词" \
   -H "Authorization: Bearer $API_KEY"
 # 获取单篇
-curl "https://www.2ryun.com/restapi/documents/:id" -H "Authorization: Bearer $API_KEY"
+curl "https://www.2ryun.com/api/documents/:id" -H "Authorization: Bearer $API_KEY"
 ```
 
 ### 场景 1.3：更新 / 删除
@@ -92,7 +92,7 @@ curl "https://www.2ryun.com/restapi/documents/:id" -H "Authorization: Bearer $AP
 用户说："帮我查一下 XX 相关的知识" / "我的知识库里有什么关于 XX 的"
 
 ```bash
-curl "https://www.2ryun.com/restapi/wiki/search?q=查询词&max_results=10" \
+curl "https://www.2ryun.com/api/wiki/search?q=查询词&max_results=10" \
   -H "Authorization: Bearer $API_KEY"
 ```
 返回语义相似的知识条目，按相关度排序。用于回答问题、查找背景信息、辅助写作。
@@ -101,9 +101,9 @@ curl "https://www.2ryun.com/restapi/wiki/search?q=查询词&max_results=10" \
 
 ```bash
 # 可视化用（节点+边）
-curl "https://www.2ryun.com/restapi/wiki/graph?root_id=xxx" -H "Authorization: Bearer $API_KEY"
+curl "https://www.2ryun.com/api/wiki/graph?root_id=xxx" -H "Authorization: Bearer $API_KEY"
 # 带元数据
-curl "https://www.2ryun.com/restapi/wiki/graph/data?max_nodes=100" -H "Authorization: Bearer $API_KEY"
+curl "https://www.2ryun.com/api/wiki/graph/data?max_nodes=100" -H "Authorization: Bearer $API_KEY"
 ```
 用于了解知识结构、发现关联、识别知识空白。
 
@@ -111,11 +111,11 @@ curl "https://www.2ryun.com/restapi/wiki/graph/data?max_nodes=100" -H "Authoriza
 
 ```bash
 # 条目列表
-curl "https://www.2ryun.com/restapi/wiki/entries?limit=100" -H "Authorization: Bearer $API_KEY"
+curl "https://www.2ryun.com/api/wiki/entries?limit=100" -H "Authorization: Bearer $API_KEY"
 # 统计
-curl "https://www.2ryun.com/restapi/wiki/stats" -H "Authorization: Bearer $API_KEY"
+curl "https://www.2ryun.com/api/wiki/stats" -H "Authorization: Bearer $API_KEY"
 # 哪些文档已提取
-curl "https://www.2ryun.com/restapi/wiki/extracted-status?content_ids=id1,id2" \
+curl "https://www.2ryun.com/api/wiki/extracted-status?content_ids=id1,id2" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
@@ -140,24 +140,24 @@ curl "https://www.2ryun.com/restapi/wiki/extracted-status?content_ids=id1,id2" \
 1. 获取文档：`GET /restapi/documents/:id`
 2. **选择模板**：先获取可用模板列表，根据内容类型选择最合适的：
    ```bash
-   curl "https://www.2ryun.com/restapi/gen-html/templates" -H "Authorization: Bearer $API_KEY"
+   curl "https://www.2ryun.com/api/gen-html/templates" -H "Authorization: Bearer $API_KEY"
    ```
    返回模板名和描述。LLM 根据文档内容判断：长文博客→`article-magazine`，技术文档→`documentation`，产品介绍→`landing-page`，综合站点→`magazine-minimal`。**不要硬编码模板**，始终从接口获取并根据内容匹配。
 3. **生成**：
    ```bash
-   curl -X POST https://www.2ryun.com/restapi/gen-html/generate \
+   curl -X POST https://www.2ryun.com/api/gen-html/generate \
      -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
      -d '{"content":"Markdown 内容","title":"页面标题","template":"选定的模板名"}'
    ```
 4. 发布：`POST /restapi/gen-html/generations/GEN_ID/publish`
-5. URL：`https://www.2ryun.com/restapi/gen-html/public/GEN_ID`
+5. URL：`https://www.2ryun.com/api/gen-html/public/GEN_ID`
 
 ### 场景 3.2：从文档树构建多页面网站
 
 1. 获取文档树：`GET /restapi/documents/fulltree/:rootId`
 2. 创建站点：
    ```bash
-   curl -X POST https://www.2ryun.com/restapi/gen-html/sites \
+   curl -X POST https://www.2ryun.com/api/gen-html/sites \
      -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
      -d '{"name":"站点名","content_id":"根文档id","template":"magazine-minimal","docs":[...]}'
    ```
@@ -179,14 +179,14 @@ curl "https://www.2ryun.com/restapi/wiki/extracted-status?content_ids=id1,id2" \
 已生成的网页可以通过对话方式继续编辑：
 
 ```bash
-curl -X POST https://www.2ryun.com/restapi/gen-html/generations/GEN_ID/chat \
+curl -X POST https://www.2ryun.com/api/gen-html/generations/GEN_ID/chat \
   -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
   -d '{"feedback": "把标题改成红色，字号加大到 48px"}'
 ```
 
 支持选中页面的某个局部区域进行针对性编辑，传入选中区域的 HTML：
 ```bash
-curl -X POST https://www.2ryun.com/restapi/gen-html/generations/GEN_ID/chat \
+curl -X POST https://www.2ryun.com/api/gen-html/generations/GEN_ID/chat \
   -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
   -d '{"feedback": "把这段改成蓝色背景", "selected_html": "<div>...</div>"}'
 ```
@@ -199,7 +199,7 @@ curl -X POST https://www.2ryun.com/restapi/gen-html/generations/GEN_ID/chat \
 
 ### 创建笔记
 ```bash
-curl -X POST https://www.2ryun.com/restapi/note/create \
+curl -X POST https://www.2ryun.com/api/note/create \
   -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
   -d '{"title": "会议备忘", "content": "Markdown 正文"}'
 ```
