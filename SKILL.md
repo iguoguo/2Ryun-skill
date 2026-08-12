@@ -257,6 +257,13 @@ curl --get "https://www.2ryun.com/restapi/wiki/search" \
 curl "https://www.2ryun.com/restapi/wiki/search?q=迪赞文化"
 ```
 
+**文档树**：创建文档时，`rootId` 和 `parentId` 必须**同时存在**才能准确构建文档树：
+- 根文档（一级文档）：`rootId` 和 `parentId` 设为**同一个值**（都等于根文档自己的 ID）
+- 子文档：`rootId` 指向根文档，`parentId` 指向直接父文档
+- 不传这两个字段则创建独立文档（不属于任何树）
+curl "https://www.2ryun.com/restapi/wiki/search?q=迪赞文化"
+```
+
 ## 重要规则
 
 1. **先问 API Key**：用户需要从 2Ryun 设置页的「API Keys」标签创建
