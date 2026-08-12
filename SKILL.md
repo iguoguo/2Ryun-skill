@@ -243,6 +243,20 @@ curl -X POST https://www.2ryun.com/api/note/create \
 | 创建站点 | `POST /restapi/gen-html/sites` | 从文档树构建 |
 | 发布 | `POST /restapi/gen-html/*/publish` | 获取公开 URL |
 
+## 重要细节
+
+**URL 编码**：查询参数中包含中文等非 ASCII 字符时，必须 URL 编码。curl 使用 `--data-urlencode`，编程语言使用 `encodeURIComponent` / `urlencode`。
+
+```bash
+# ✅ 正确 — curl 自动编码
+curl --get "https://www.2ryun.com/restapi/wiki/search" \
+  --data-urlencode "q=迪赞文化" \
+  -H "Authorization: Bearer $API_KEY"
+
+# ❌ 错误 — 中文直接拼接
+curl "https://www.2ryun.com/restapi/wiki/search?q=迪赞文化"
+```
+
 ## 重要规则
 
 1. **先问 API Key**：用户需要从 2Ryun 设置页的「API Keys」标签创建
