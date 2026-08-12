@@ -1,4 +1,4 @@
-# 2Ryun API Skill
+# 2Ryun Skill
 
 Claude Code skill for the [2Ryun](https://2ryun.com) platform — an AI-era knowledge operating system.
 
@@ -14,11 +14,14 @@ This skill enables Claude Code to interact with 2Ryun's REST API, providing:
 ## Installation
 
 ```bash
-# Via Claude Code Skill Marketplace (recommended)
-claude install 2ryun-api
+# ClawHub
+clawhub install 2Ryun-skill
 
-# Or manually
-git clone https://github.com/iguoguo/2Ryun-skill ~/.claude/skills/2ryun-api
+# SkillHub
+npx skillhub install 2Ryun-skill
+
+# Manual
+git clone https://github.com/iguoguo/2Ryun-skill ~/.claude/skills/2Ryun-skill
 ```
 
 ## Setup
@@ -36,7 +39,7 @@ All API calls use `Authorization: Bearer <api-key>` header.
 
 ## API Documentation
 
-Full API spec: [2ryun-api-spec.md](https://github.com/iguoguo/2Ryun/blob/main/docs/2ryun-api-spec.md)
+Full API spec: [2ryun-api-spec.md](2ryun-api-spec.md)
 
 ## License
 
