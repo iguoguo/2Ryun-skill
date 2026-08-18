@@ -30,6 +30,7 @@
 | 文档页面 | `https://www.2ryun.com/app/:doc_id` | 2Ryun 内部文档页（需登录） |
 | 封面图 | `https://www.2ryun.com/api/gen-html/generations/:id/cover` | JPEG，可嵌入 `<img>` |
 | 模板预览 | `https://www.2ryun.com/api/gen-html/templates/:name/example` | 模板示例 HTML |
+| 上传的文件 | `https://www.2ryun.com/:path` | 图片/视频等素材，`path` 为上传接口返回的 `path` 字段 |
 
 **API → URL 映射**：
 
@@ -1524,6 +1525,102 @@ POST /restapi/note/duplicate/:id
 ```
 
 复制指定笔记。新笔记标题为原标题 + " (Copy)"。
+
+---
+
+## 6. 附件管理 (Attachments)
+
+上传和管理图片、视频、文档等素材文件。与素材库共用同一套 Attachment 数据，通过该接口上传的文件可在 2Ryun 素材库中查看。
+
+### 6.1 上传文件
+
+```
+POST /restapi/attachments/upload
+```
+
+上传单个文件（图片/视频/文档，multipart 字段名 `file`）。支持扩展名：`jpeg` `jpg` `png` `gif` `svg` `webp` `webm` `mp4` `mp3` `pdf` `docx` `xlsx` `ppt` `pptx` `xls` `doc` `txt` `md` `markdown` `csv` `html` `htm` `ico` `zip` `rar` `ogg` `wav`。单文件上限 20MB。
+
+**请求格式**：`multipart/form-data`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| file | file | 是 | 要上传的文件 |
+| folderId | string | 否 | 素材文件夹 ID（不传则归入"未分组"） |
+
+**请求示例**
+
+```bash
+curl -X POST https://www.2ryun.com/restapi/attachments/upload \
+  -H "Authorization: Bearer $API_KEY" \
+  -F "file=@cover.png" \
+  -F "folderId=64f0a2b3c4d5e6f7a8b9c0d1"
+```
+
+**返回示例**
+
+```json
+{
+  "message": "Attachment uploaded successfully",
+  "file": {
+    "_id": "64f0a2b3c4d5e6f7a8b9c0d1",
+    "filename": "cover.png",
+    "path": "uploads/2026/08/1692388-cover.png",
+    "thumbnail": "uploads/2026/08/thumbnails/1692388-cover-thumb.jpg",
+    "size": 20480,
+    "mineType": "image/png",
+    "fileType": ".png",
+    "folderId": null,
+    "createdBy": "64e0a2b3c4d5e6f7a8b9c0d2",
+    "createdAt": "2026-08-19T08:00:00.000Z"
+  }
+}
+```
+
+文件访问 URL：`https://www.2ryun.com/<path>`（无需 API Key，可直接用于 `<img>` / `<video>`）。
+
+### 6.2 多文件上传
+
+```
+POST /restapi/attachments/upload/multiple
+```
+
+一次上传最多 10 个文件（multipart 字段名 `file`，可重复）。
+
+**返回**：`{ "message": "Attachments uploaded successfully", "files": [...], "success": true }`
+
+### 6.3 附件列表
+
+```
+GET /restapi/attachments
+```
+
+**Query 参数**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| type | string | 否 | 筛选类型：`image` / `video` / `audio` / `document` |
+| folderId | string | 否 | 按文件夹筛选（`null` 或空表示未分组） |
+| keyword | string | 否 | 按文件名模糊搜索 |
+| page | number | 否 | 页码，默认 1 |
+| pageSize | number | 否 | 每页数量，默认 20 |
+
+**返回**：`{ "success": true, "data": { "list": [...], "pagination": { "page", "pageSize", "total", "totalPages" } } }`
+
+### 6.4 下载文件
+
+```
+GET /restapi/attachments/file/:id
+```
+
+返回附件文件流（`Content-Disposition: attachment`），`Content-Type` 为文件的 MIME。
+
+### 6.5 删除附件
+
+```
+DELETE /restapi/attachments/:id
+```
+
+删除附件（同时删除物理文件与缩略图），并释放存储配额。
 
 ---
 

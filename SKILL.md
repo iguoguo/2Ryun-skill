@@ -214,6 +214,41 @@ curl -X POST https://www.2ryun.com/restapi/note/create \
 
 ---
 
+## 能力五：素材上传（图片 / 视频）
+
+上传图片、视频等素材文件，返回可直接访问的 URL。
+
+### 上传单个文件
+
+```bash
+curl -X POST https://www.2ryun.com/restapi/attachments/upload \
+  -H "Authorization: Bearer $API_KEY" \
+  -F "file=@/path/to/image.png" \
+  -F "folderId=可选，素材文件夹ID"
+```
+
+返回 JSON 的 `file.path` 即文件路径，完整访问 URL = `https://www.2ryun.com/<path>`（无需 API Key，可直接用于 `<img>` / `<video>`）。
+
+### 多文件上传
+
+```bash
+curl -X POST https://www.2ryun.com/restapi/attachments/upload/multiple \
+  -H "Authorization: Bearer $API_KEY" \
+  -F "file=@a.png" -F "file=@b.mp4"
+```
+
+一次最多 10 个文件。
+
+### 列表 / 下载 / 删除
+
+- `GET /restapi/attachments?type=image` — 列表（`type`: image/video/audio/document，支持分页、关键词、文件夹）
+- `GET /restapi/attachments/file/:id` — 下载文件
+- `DELETE /restapi/attachments/:id` — 删除
+
+支持格式：图片（png/jpg/jpeg/gif/svg/webp）、视频（mp4/webm）、音频、文档等，单文件上限 20MB。
+
+---
+
 ## 错误处理
 
 | 状态码 | 含义 | Agent 行为 |
@@ -242,6 +277,7 @@ curl -X POST https://www.2ryun.com/restapi/note/create \
 | 聊天编辑 | `POST /restapi/gen-html/generations/:id/chat` | 对话式编辑网页 |
 | 创建站点 | `POST /restapi/gen-html/sites` | 从文档树构建 |
 | 发布 | `POST /restapi/gen-html/*/publish` | 获取公开 URL |
+| 上传素材 | `POST /restapi/attachments/upload` | 图片/视频/文档，返回可访问 URL |
 
 ## 重要细节
 
