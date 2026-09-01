@@ -6,7 +6,7 @@
 
 | 项目 | 值 |
 |------|-----|
-| Base URL | `https://www.2ryun.com/api` |
+| Base URL | `https://www.2ryun.com/restapi` |
 | 鉴权方式 | HTTP Header `Authorization: Bearer sk-xxxxxxxx-xxxxxxxx-...` |
 | 请求格式 | `application/json`（文件导入为 `multipart/form-data`） |
 | 响应格式 | `application/json` |
@@ -18,18 +18,28 @@
 
 登录 2Ryun → 设置 → API Keys → 创建新 Key。Key 格式为 `sk-` 前缀 + 多段随机字符串。使用时放在 `Authorization: Bearer <key>` Header 中。
 
+### API Key 权限（模块级）
+
+每个 API Key 有一组模块权限，格式 `{module}:read` / `{module}:write`（模块内 write 包含 read）。模块：`documents`、`wiki`、`gen-html`、`note`、`attachments`、`users`（仅 read）。新 Key 默认全部模块读写；可在设置页收窄。
+
+权限不足时返回：
+```json
+{ "error": "API Key 权限不足", "code": "INSUFFICIENT_SCOPE", "required": "documents:write" }
+```
+状态码 **407**。
+
 ### 内容访问 URL 规则
 
 以下 URL 用于向用户展示已发布的内容，**无需 API Key**，可直接在浏览器打开。
 
 | 内容类型 | URL 模式 | 说明 |
 |---------|---------|------|
-| 已发布网页 | `https://www.2ryun.com/api/gen-html/public/:generation_id` | 单页生成结果 |
+| 已发布网页 | `https://www.2ryun.com/restapi/gen-html/public/:generation_id` | 单页生成结果 |
 | 已发布站点 | `https://www.2ryun.com/s/:site_id` | 站点首页 |
 | 站点内页面 | `https://www.2ryun.com/s/:site_id/:slug` | 站点子页面 |
 | 文档页面 | `https://www.2ryun.com/app/:doc_id` | 2Ryun 内部文档页（需登录） |
-| 封面图 | `https://www.2ryun.com/api/gen-html/generations/:id/cover` | JPEG，可嵌入 `<img>` |
-| 模板预览 | `https://www.2ryun.com/api/gen-html/templates/:name/example` | 模板示例 HTML |
+| 封面图 | `https://www.2ryun.com/restapi/gen-html/generations/:id/cover` | JPEG，可嵌入 `<img>` |
+| 模板预览 | `https://www.2ryun.com/restapi/gen-html/templates/:name/example` | 模板示例 HTML |
 | 上传的文件 | `https://www.2ryun.com/:path` | 图片/视频等素材，`path` 为上传接口返回的 `path` 字段 |
 
 **API → URL 映射**：
@@ -68,7 +78,7 @@ GET /restapi/documents
 
 ```json
 {
-  "data": [
+  "documents": [
     {
       "_id": "6a69810fef276a17f2fb089f",
       "title": "产品白皮书",
@@ -90,17 +100,17 @@ GET /restapi/documents
 | 返回字段 | 类型 | 说明 |
 |----------|------|------|
 | documents | array | 文档对象数组 |
-| data[]._id | string | 文档唯一 ID |
-| data[].title | string | 文档标题 |
-| data[].content | string | Markdown 格式正文（可能为空） |
-| data[].summary | string | 文档摘要 |
-| data[].tags | string[] | 标签数组 |
-| data[].board | string | 所属画板 |
-| data[].parentId | string\|null | 父文档 ID |
-| data[].rootId | string | 根文档 ID |
-| data[].createdBy | string | 创建者用户 ID |
-| data[].createdAt | string | 创建时间 ISO 8601 |
-| data[].updatedAt | string | 更新时间 ISO 8601 |
+| documents[]._id | string | 文档唯一 ID |
+| documents[].title | string | 文档标题 |
+| documents[].content | string | Markdown 格式正文（可能为空） |
+| documents[].summary | string | 文档摘要 |
+| documents[].tags | string[] | 标签数组 |
+| documents[].board | string | 所属画板 |
+| documents[].parentId | string\|null | 父文档 ID |
+| documents[].rootId | string | 根文档 ID |
+| documents[].createdBy | string | 创建者用户 ID |
+| documents[].createdAt | string | 创建时间 ISO 8601 |
+| documents[].updatedAt | string | 更新时间 ISO 8601 |
 | total | number | 符合条件的文档总数 |
 
 ---
@@ -158,7 +168,7 @@ POST /restapi/documents/create
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/documents/create \
+curl -X POST https://www.2ryun.com/restapi/documents/create \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -207,7 +217,7 @@ POST /restapi/documents/import
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/documents/import \
+curl -X POST https://www.2ryun.com/restapi/documents/import \
   -H "Authorization: Bearer $API_KEY" \
   -F "file=@report.pdf" \
   -F "title=季度报告" \
@@ -245,7 +255,7 @@ PUT /restapi/documents/update/:id
 **请求示例**
 
 ```bash
-curl -X PUT https://www.2ryun.com/api/documents/update/6a69810fef276a17f2fb089f \
+curl -X PUT https://www.2ryun.com/restapi/documents/update/6a69810fef276a17f2fb089f \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"title": "更新后的标题", "content": "更新后的内容", "tags": ["新标签"]}'
@@ -286,7 +296,7 @@ POST /restapi/documents/batch
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/documents/batch \
+curl -X POST https://www.2ryun.com/restapi/documents/batch \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"ids": ["6a69810fef276a17f2fb089f", "6a69810fef276a17f2fb08a0"]}'
@@ -457,7 +467,7 @@ POST /restapi/wiki/extract
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/wiki/extract \
+curl -X POST https://www.2ryun.com/restapi/wiki/extract \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -571,7 +581,7 @@ POST /restapi/wiki/extract-batch
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/wiki/extract-batch \
+curl -X POST https://www.2ryun.com/restapi/wiki/extract-batch \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -627,7 +637,7 @@ POST /restapi/wiki/organize
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/wiki/organize \
+curl -X POST https://www.2ryun.com/restapi/wiki/organize \
   -H "Authorization: Bearer $API_KEY"
 ```
 
@@ -785,7 +795,7 @@ GET /restapi/wiki/search
 **请求示例**
 
 ```bash
-curl "https://www.2ryun.com/api/wiki/search?q=人工智能&max_results=5" \
+curl "https://www.2ryun.com/restapi/wiki/search?q=人工智能&max_results=5" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
@@ -871,7 +881,7 @@ GET /restapi/wiki/extracted-status
 **请求示例**
 
 ```bash
-curl "https://www.2ryun.com/api/wiki/extracted-status?content_ids=id1,id2,id3,id4" \
+curl "https://www.2ryun.com/restapi/wiki/extracted-status?content_ids=id1,id2,id3,id4" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
@@ -949,7 +959,7 @@ POST /restapi/gen-html/generate
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/gen-html/generate \
+curl -X POST https://www.2ryun.com/restapi/gen-html/generate \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1117,7 +1127,7 @@ POST /restapi/gen-html/generations/:id/chat
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/gen-html/generations/xxx/chat \
+curl -X POST https://www.2ryun.com/restapi/gen-html/generations/xxx/chat \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"feedback": "请把页面标题颜色改为深蓝色，字号增大到 32px"}'
@@ -1183,7 +1193,7 @@ POST /restapi/gen-html/sites
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/gen-html/sites \
+curl -X POST https://www.2ryun.com/restapi/gen-html/sites \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1341,7 +1351,7 @@ GET /restapi/users/quota
 **请求示例**
 
 ```bash
-curl "https://www.2ryun.com/api/users/quota" \
+curl "https://www.2ryun.com/restapi/users/quota" \
   -H "Authorization: Bearer $API_KEY"
 ```
 
@@ -1453,7 +1463,7 @@ POST /restapi/note/create
 **请求示例**
 
 ```bash
-curl -X POST https://www.2ryun.com/api/note/create \
+curl -X POST https://www.2ryun.com/restapi/note/create \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"title": "灵感备忘", "content": "想到一个好点子..."}'
@@ -1496,7 +1506,7 @@ PUT /restapi/note/:id
 **请求示例**
 
 ```bash
-curl -X PUT https://www.2ryun.com/api/note/6a69810fef276a17f2fb0900 \
+curl -X PUT https://www.2ryun.com/restapi/note/6a69810fef276a17f2fb0900 \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"title": "更新后的备忘", "content": "补充了更多细节"}'
@@ -1635,6 +1645,7 @@ DELETE /restapi/attachments/:id
 | 402 | 积分不足 | 需充值后才能使用 AI 功能 |
 | 403 | 无权访问 | 不是文档所有者、配额超限 |
 | 404 | 资源不存在 | 文档/条目/生成记录 ID 无效 |
+| 407 | Key 权限不足 | 该 Key 缺少 required 模块权限，去设置页调整 |
 | 429 | 频率限制 | 请求太频繁，稍后重试 |
 | 500 | 服务器错误 | 内部异常 |
 
