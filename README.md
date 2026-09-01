@@ -8,7 +8,7 @@ This skill enables Claude Code to interact with 2Ryun's REST API, providing:
 
 - **Document Management** — Create, read, update, delete, import, and search documents
 - **Knowledge Base** — Semantic search, knowledge graphs, automatic knowledge extraction
-- **Website Generation** — Convert documents to beautiful web pages (75+ templates), build multi-page sites
+- **Website Generation** — Convert documents to beautiful web pages (75+ templates)
 - **Notes** — Lightweight notes for quick capture and memos
 
 ## Installation
